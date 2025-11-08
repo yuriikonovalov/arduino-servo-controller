@@ -1,0 +1,22 @@
+{
+  "appId": "com.yuriikonoval.arduinocontrol",
+  "icon": "./appIcon.png",
+  "productName": "Arduino Control",
+  "extraResources": [
+    "dist-electron/preload.cjs"
+  ],
+  "files": [
+    "dist-electron",
+    "dist-react"
+  ],
+  "win": {
+    "target": [
+      "portable"
+    ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true
+  }
+}
