@@ -1,7 +1,7 @@
 {
   "appId": "com.yuriikonoval.arduinocontrol",
   "icon": "./appIcon.png",
-  "productName": "Arduino Control",
+  "productName": "Antenna Control",
   "extraResources": [
     "dist-electron/preload.cjs"
   ],

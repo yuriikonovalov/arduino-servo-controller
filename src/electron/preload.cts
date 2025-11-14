@@ -10,11 +10,14 @@ const IpcCommands = {
     DECREASE_STOP: "DECREASE_STOP",
     MOVE_TO_CENTER: "MOVE_TO_CENTER",
     ON_ARDUINO_ANGLE_CHANGED: "ON_ARDUINO_ANGLE_CHANGED",
-    GET_PORTS: "GET_PORTS",
-    CONNECT_TO_PORT: "CONNECT_TO_PORT",
-    ON_PORT_DISCONNECTED: "ON_PORT_DISCONNECTED",
-    GET_ANGLE_OF_SERVO_CENTER_TO_NORTH: "GET_ANGLE_OF_SERVO_CENTER_TO_NORTH",
-    SET_ANGLE_OF_SERVO_CENTER_TO_NORTH: "SET_ANGLE_OF_SERVO_CENTER_TO_NORTH"
+    CONNECT: "CONNECT",
+    DISCONNECT: "DISCONNECT",
+    ON_DISCONNECTED: "ON_DISCONNECTED",
+    SET_ANGLE_OF_SERVO_CENTER_TO_NORTH: "SET_ANGLE_OF_SERVO_CENTER_TO_NORTH",
+    SET_IP_AND_PORT: "SET_IP_AND_PORT",
+    SET_STEP: "SET_STEP",
+    GET_SAVED_STATE: "GET_SAVED_STATE",
+    ON_ERROR: "ON_ERROR"
 };
 
 contextBridge.exposeInMainWorld("application", {
@@ -25,18 +28,30 @@ contextBridge.exposeInMainWorld("application", {
     decreaseStop: (): Promise<void> => ipcRenderer.invoke(IpcCommands.DECREASE_STOP),
     decreaseStart: (): Promise<void> => ipcRenderer.invoke(IpcCommands.DECREASE_START),
     moveToCenter: (): Promise<void> => ipcRenderer.invoke(IpcCommands.MOVE_TO_CENTER),
-    getPorts: (): Promise<any[]> => ipcRenderer.invoke(IpcCommands.GET_PORTS),
     onAngleChanged: (callback: (angle: number) => void): () => any => {
         const listener = (_: any, data: any) => callback(data);
         ipcRenderer.on(IpcCommands.ON_ARDUINO_ANGLE_CHANGED, listener);
         return () => ipcRenderer.off(IpcCommands.ON_ARDUINO_ANGLE_CHANGED, listener);
     },
-    connectToPort: (path: string): Promise<boolean> => ipcRenderer.invoke(IpcCommands.CONNECT_TO_PORT, path),
-    onPortDisconnected: (callback: () => void): () => any => {
+    connect: (ip: string, port: number): Promise<boolean> => ipcRenderer.invoke(IpcCommands.CONNECT, ip, port),
+    disconnect: (): Promise<void> => ipcRenderer.invoke(IpcCommands.DISCONNECT),
+    onDisconnected: (callback: () => void): () => any => {
         const listener = () => callback();
-        ipcRenderer.on(IpcCommands.ON_PORT_DISCONNECTED, listener);
-        return () => ipcRenderer.off(IpcCommands.ON_PORT_DISCONNECTED, listener);
+        ipcRenderer.on(IpcCommands.ON_DISCONNECTED, listener);
+        return () => ipcRenderer.off(IpcCommands.ON_DISCONNECTED, listener);
     },
-    getAngleOfServoCenterToNorth: (): Promise<number> => ipcRenderer.invoke(IpcCommands.GET_ANGLE_OF_SERVO_CENTER_TO_NORTH),
-    setAngleOfServoCenterToNorth: (angle: number): Promise<void> => ipcRenderer.invoke(IpcCommands.SET_ANGLE_OF_SERVO_CENTER_TO_NORTH, angle)
+    setAngleOfServoCenterToNorth: (angle: number): Promise<void> => ipcRenderer.invoke(IpcCommands.SET_ANGLE_OF_SERVO_CENTER_TO_NORTH, angle),
+    setIpAndPort: (ip: string, port: number): Promise<void> => ipcRenderer.invoke(IpcCommands.SET_IP_AND_PORT, ip, port),
+    setStep: (step: number): Promise<void> => ipcRenderer.invoke(IpcCommands.SET_STEP, step),
+    getSavedState: (): Promise<{
+        ip: string,
+        port: number,
+        step: number,
+        angle: number,
+        angleOfServoCenterToNorth: number
+    }> => ipcRenderer.invoke(IpcCommands.GET_SAVED_STATE),
+    onError: (callback: () => void): () => any => {
+        ipcRenderer.on(IpcCommands.ON_ERROR, callback);
+        return () => ipcRenderer.off(IpcCommands.ON_ERROR, callback);
+    },
 } satisfies Window["application"]);

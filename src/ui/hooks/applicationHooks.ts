@@ -1,32 +1,43 @@
 import {useEffect} from "react";
-import {angleService} from "../service/angleService.ts";
 import {applicationAction} from "../applicationStore.ts";
-import {portService} from "../service/portService.ts";
+import {applicationService} from "../service/applicationService.ts";
+import {preferencesService} from "../service/preferencesService.ts";
 import {App} from "antd";
 
 function useListenToAngleChanges() {
     const setAngle = applicationAction.useSetAngle();
     useEffect(() => {
-        const unsubscribe = angleService.onAngleChanged((angle) => {
+        const unsubscribe = applicationService.onAngleChanged((angle) => {
             setAngle(angle);
         });
         return unsubscribe;
     }, [setAngle]);
 }
 
-function useListenToPortDisconnected() {
+function useListenToError() {
     const {message} = App.useApp();
-    const selectPort = applicationAction.useSelectPort();
     useEffect(() => {
-        const unsubscribe = portService.onPortDisconnected(() => {
-            selectPort(null);
-            message.error("Порт відключено");
+        const unsubscribe = applicationService.onError(() => {
+            message.error("Сталася помилка");
         });
         return unsubscribe;
-    }, [selectPort]);
+    }, []);
 }
+
+function useSavedState() {
+    const setState = applicationAction.useSetSavedState();
+    const getState = async () => {
+        const state = await preferencesService.getSavedState();
+        setState(state.ip, state.port, state.step, state.angle - state.angleOfServoCenterToNorth, state.angleOfServoCenterToNorth);
+    };
+    useEffect(() => {
+        getState();
+    }, []);
+}
+
 
 export const applicationHooks = {
     useListenToAngleChanges,
-    useListenToPortDisconnected
+    useSavedState,
+    useListenToError
 };

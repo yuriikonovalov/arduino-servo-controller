@@ -1,26 +1,21 @@
 import {ArduinoResponses} from "./arduinoCommands.js";
 
 export class ArduinoResponseHandler {
-    private onReadyCallback: (() => void) | null = null;
     private onAppliedAngleCallback: ((angle: number) => void) | null = null;
-
-    setOnReadyCallback(callback: () => void) {
-        this.onReadyCallback = callback;
-    }
 
     setOnAppliedAngleCallback(callback: (angle: number) => void) {
         this.onAppliedAngleCallback = callback;
     }
 
     handle(response: any) {
-        if (typeof response !== "string") return;
-        switch (true) {
-            case response === ArduinoResponses.READY:
-                this.onReadyCallback?.();
-                break;
-            case this.isAppliedAngleResponse(response):
-                this.onAppliedAngleCallback?.(this.extractAppliedAngle(response));
-                break;
+        try {
+            const data = response.toString().trim();
+            console.log(data);
+            if (this.isAppliedAngleResponse(data)) {
+                this.onAppliedAngleCallback?.(this.extractAppliedAngle(data));
+            }
+        } catch (error) {
+            return;
         }
     }
 

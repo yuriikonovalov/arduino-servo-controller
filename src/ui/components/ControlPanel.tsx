@@ -3,7 +3,7 @@ import {Button} from "antd";
 import {applicationStore} from "../applicationStore.ts";
 
 export default function ControlPanel() {
-    const controlDisabled = applicationStore.useIsControlDisabled();
+    const controlDisabled = !applicationStore.useConnected();
 
     return (
         <div className="flex gap-2 self-center">
@@ -14,19 +14,19 @@ export default function ControlPanel() {
             />
             <Button
                 disabled={controlDisabled}
-                onMouseDown={window.application.decreaseStart}
-                onMouseUp={window.application.decreaseStop}
+                onMouseDown={event => event.button === 0 && window.application.decreaseStart()}
+                onMouseUp={event => event.button === 0 && window.application.decreaseStop()}
                 icon={<FaAnglesLeft/>}
             />
             <Button
                 disabled={controlDisabled}
-                onClick={window.application.moveToCenter}
+                onClick={event => event.button === 0 && window.application.moveToCenter()}
                 icon={<FaRegCircle/>}
             />
             <Button
                 disabled={controlDisabled}
-                onMouseDown={window.application.increaseStart}
-                onMouseUp={window.application.increaseStop}
+                onMouseDown={event => event.button === 0 && window.application.increaseStart()}
+                onMouseUp={event => event.button === 0 && window.application.increaseStop()}
                 icon={<FaAnglesRight/>}
             />
             <Button

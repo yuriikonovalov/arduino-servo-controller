@@ -2,31 +2,33 @@ import {Button, InputNumber} from "antd";
 import {useState} from "react";
 import {RxUpdate} from "react-icons/rx";
 import {MdDone} from "react-icons/md";
-import {initialPositionHooks} from "../hooks/initialPositionHooks.ts";
 import {applicationAction, applicationStore} from "../applicationStore.ts";
-import {angleService} from "../service/angleService.ts";
+import {preferencesService} from "../service/preferencesService.ts";
 
-export default function InitialPosition() {
-    initialPositionHooks.useInitialPosition();
-    const initialPositionAngle = applicationStore.useInitialPositionAngle();
-    const setInitialPositionAngle = applicationAction.useSetInitialPositionAngle();
+type InitialAzimuthProps = {
+    className?: string
+}
 
+export default function InitialAzimuth(props: InitialAzimuthProps) {
+    const angleOfServoCenterToNorth = applicationStore.angleOfServoCenterToNorth();
+    const setAngleOfServoCenterToNorth = applicationAction.setAngleOfServoCenterToNorth();
     const [disabled, setDisabled] = useState(true);
 
     return (
-        <div className="w-full flex gap-2 items-center">
-            <p className="text-sm">Кут напрямку:</p>
+        <div className={`flex gap-2 items-center ${props.className}`}>
+            <p className="text-sm">Початковий азимут:</p>
             <InputNumber
                 min={0}
                 max={359}
                 step={1}
+                style={{width: "5em"}}
                 changeOnWheel={true}
                 onChange={async (value) => {
                     if (value !== null) {
-                        setInitialPositionAngle(value);
+                        setAngleOfServoCenterToNorth(value);
                     }
                 }}
-                value={initialPositionAngle}
+                value={angleOfServoCenterToNorth}
                 disabled={disabled}
             />
 
@@ -34,7 +36,7 @@ export default function InitialPosition() {
                 icon={disabled ? <RxUpdate/> : <MdDone/>}
                 type={disabled ? "default" : "primary"}
                 onClick={async () => {
-                    await angleService.setInitialPositionAngle(initialPositionAngle);
+                    await preferencesService.saveAngleOfServoCenterToNorth(angleOfServoCenterToNorth);
                     setDisabled(!disabled);
                 }}
             />
