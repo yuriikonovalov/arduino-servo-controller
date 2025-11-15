@@ -1,5 +1,5 @@
 {
-  "appId": "com.yuriikonoval.arduinocontrol",
+  "appId": "com.yuriikonovalov.arduinocontrol",
   "icon": "./appIcon.png",
   "productName": "Antenna Control",
   "extraResources": [
